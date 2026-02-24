@@ -1,0 +1,185 @@
+/**
+ * 筋力トレーニング（resistance）— 15種
+ */
+ExerciseRegistry.register([
+  {
+    id: 'resist-sit-stand',
+    category: 'resistance',
+    name: '椅子立ち座り',
+    description: '椅子からゆっくり立ち上がり座る',
+    intensity: 2,
+    defaultSets: 2,
+    defaultReps: 10,
+    defaultDuration: null,
+    position: 'seated',
+    notes: null
+  },
+  {
+    id: 'resist-wall-push',
+    category: 'resistance',
+    name: '壁腕立て',
+    description: '壁に手をつき腕立て伏せ',
+    intensity: 2,
+    defaultSets: 2,
+    defaultReps: 10,
+    defaultDuration: null,
+    position: 'standing',
+    notes: null
+  },
+  {
+    id: 'resist-calf-raise',
+    category: 'resistance',
+    name: 'かかと上げ',
+    description: '椅子の背をつかみかかとを上げる',
+    intensity: 1,
+    defaultSets: 2,
+    defaultReps: 10,
+    defaultDuration: null,
+    position: 'standing',
+    notes: null
+  },
+  {
+    id: 'resist-knee-ext',
+    category: 'resistance',
+    name: '膝伸ばし',
+    description: '椅子に座り膝を伸ばす',
+    intensity: 1,
+    defaultSets: 2,
+    defaultReps: 10,
+    defaultDuration: null,
+    position: 'seated',
+    notes: null
+  },
+  {
+    id: 'resist-hip-flex',
+    category: 'resistance',
+    name: '股関節屈曲',
+    description: '椅子に座り膝を持ち上げる',
+    intensity: 1,
+    defaultSets: 2,
+    defaultReps: 10,
+    defaultDuration: null,
+    position: 'seated',
+    notes: null
+  },
+  {
+    id: 'resist-hip-abd',
+    category: 'resistance',
+    name: '股関節外転',
+    description: '横向きで足を開く',
+    intensity: 2,
+    defaultSets: 2,
+    defaultReps: 10,
+    defaultDuration: null,
+    position: 'supine',
+    notes: null
+  },
+  {
+    id: 'resist-bridge',
+    category: 'resistance',
+    name: 'お尻上げ（ブリッジ）',
+    description: '仰向けで膝を曲げお尻を持ち上げる',
+    intensity: 2,
+    defaultSets: 2,
+    defaultReps: 10,
+    defaultDuration: null,
+    position: 'supine',
+    notes: null
+  },
+  {
+    id: 'resist-seated-row',
+    category: 'resistance',
+    name: '座位ローイング',
+    description: 'タオルを引くように腕を引く',
+    intensity: 2,
+    defaultSets: 2,
+    defaultReps: 10,
+    defaultDuration: null,
+    position: 'seated',
+    notes: null
+  },
+  {
+    id: 'resist-arm-curl',
+    category: 'resistance',
+    name: '腕曲げ（アームカール）',
+    description: 'ペットボトル等を持ち肘を曲げる',
+    intensity: 1,
+    defaultSets: 2,
+    defaultReps: 10,
+    defaultDuration: null,
+    position: 'seated',
+    notes: null
+  },
+  {
+    id: 'resist-overhead-press',
+    category: 'resistance',
+    name: '頭上挙げ',
+    description: 'ペットボトル等を頭上に挙げる',
+    intensity: 2,
+    defaultSets: 2,
+    defaultReps: 8,
+    defaultDuration: null,
+    position: 'seated',
+    notes: null
+  },
+  {
+    id: 'resist-leg-press-chair',
+    category: 'resistance',
+    name: '椅子レッグプレス',
+    description: '椅子に座り足裏で床を押す',
+    intensity: 1,
+    defaultSets: 2,
+    defaultReps: 10,
+    defaultDuration: null,
+    position: 'seated',
+    notes: null
+  },
+  {
+    id: 'resist-squat-hold',
+    category: 'resistance',
+    name: 'スクワットホールド',
+    description: '軽く膝を曲げて静止する',
+    intensity: 2,
+    defaultSets: 3,
+    defaultReps: null,
+    defaultDuration: 15,
+    position: 'standing',
+    notes: null
+  },
+  {
+    id: 'resist-band-pull',
+    category: 'resistance',
+    name: 'セラバンド引き',
+    description: 'セラバンドを横に引く',
+    intensity: 2,
+    defaultSets: 2,
+    defaultReps: 10,
+    defaultDuration: null,
+    position: 'seated',
+    notes: null
+  },
+  {
+    id: 'resist-grip',
+    category: 'resistance',
+    name: '握力トレーニング',
+    description: 'テニスボールを握って離す',
+    intensity: 1,
+    defaultSets: 2,
+    defaultReps: 15,
+    defaultDuration: null,
+    position: 'any',
+    notes: null
+  },
+  {
+    id: 'resist-toe-raise',
+    category: 'resistance',
+    name: 'つま先上げ',
+    description: '椅子に座りつま先を上げる',
+    intensity: 1,
+    defaultSets: 2,
+    defaultReps: 10,
+    defaultDuration: null,
+    position: 'seated',
+    notes: null
+  }
+]);
