@@ -175,12 +175,11 @@ var ResultView = (function () {
     '</div>';
 
     // 痛みの部位
-    var painLocs = data.painLocations || { front: [], back: [] };
-    var _plc = (painLocs.front ? painLocs.front.length : 0) + (painLocs.back ? painLocs.back.length : 0);
-    if (_plc > 0) {
+    var painLocs = data.painLocations || [];
+    if (painLocs.length > 0) {
       html += '<div class="confirm-row">' +
         '<span class="confirm-row-label">痛みの部位</span>' +
-        '<span class="confirm-row-value">' + _plc + '箇所</span>' +
+        '<span class="confirm-row-value">' + painLocs.length + '箇所</span>' +
       '</div>';
     }
 
@@ -384,7 +383,7 @@ var ResultView = (function () {
       vitals: data.vitals,
       blood: data.blood,
       symptoms: data.symptoms,
-      painLocations: data.painLocations || { front: [], back: [] }
+      painLocations: data.painLocations || []
     };
   }
 
@@ -502,7 +501,7 @@ var ResultView = (function () {
         d.vitals = { hr:'', sbp:'', dbp:'', spo2:'', temp:'' };
         d.blood = { hb:'', plt:'', wbc:'' };
         d.symptoms = [];
-        d.painLocations = { front: [], back: [] };
+        d.painLocations = [];
 
         // result-mode 除去
         document.getElementById('app').classList.remove('result-mode');

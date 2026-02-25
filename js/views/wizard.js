@@ -25,7 +25,7 @@ var WizardView = (function () {
     blood: { hb:'', plt:'', wbc:'' },
     symptoms: [],
     /* ボディダイアグラム */
-    painLocations: { front: [], back: [] }
+    painLocations: []
   };
 
   var TOTAL_STEPS = 5;
@@ -271,24 +271,13 @@ var WizardView = (function () {
 
   /* ── ボディダイアグラム（痛み部位図） ── */
 
-  var _currentBodyView = 'front';
-
-  var BODY_SVG_W = 300, BODY_SVG_H = 400;
-
-  function _bodyInner(view) {
-    var src = view === 'front' ? 'img/body-front.png' : 'img/body-back.png';
-    return '<image href="' + src + '" x="0" y="0" width="' + BODY_SVG_W + '" height="' + BODY_SVG_H + '"/>';
-  }
+  var BODY_SVG_W = 600, BODY_SVG_H = 400;
 
   function _renderBodyDiagram() {
     var show = (_data.esas.pain || 0) >= 1;
     return '<div class="body-diagram-wrap" id="body-diagram-wrap"' +
       (show ? '' : ' style="display:none;"') + '>' +
       '<div class="body-diagram-label">図の中で痛みのあるところに印を付けて下さい。</div>' +
-      '<div class="body-diagram-tabs">' +
-        '<button class="body-diagram-tab active" data-view="front">前面</button>' +
-        '<button class="body-diagram-tab" data-view="back">背面</button>' +
-      '</div>' +
       '<div id="body-diagram-svg-area"></div>' +
       '<div style="display:flex;align-items:center;gap:0.5rem;margin-top:0.5rem;">' +
         '<button class="btn btn-sm btn-outline" id="body-diagram-clear">クリア</button>' +
@@ -301,38 +290,35 @@ var WizardView = (function () {
     var area = document.getElementById('body-diagram-svg-area');
     if (!area) return;
 
-    var inner = _bodyInner(_currentBodyView);
-
     /* マーカー描画 */
-    var locs = _data.painLocations[_currentBodyView] || [];
+    var locs = _data.painLocations || [];
     var markers = '';
     for (var i = 0; i < locs.length; i++) {
       markers += '<circle cx="' + (locs[i].x * BODY_SVG_W) + '" cy="' + (locs[i].y * BODY_SVG_H) +
-        '" r="10" class="pain-marker"/>';
+        '" r="8" class="pain-marker"/>';
     }
 
     area.innerHTML =
       '<svg viewBox="0 0 ' + BODY_SVG_W + ' ' + BODY_SVG_H + '" class="body-diagram-svg" id="body-svg">' +
-      inner + markers + '</svg>';
+      '<image href="img/body-diagram.png" x="0" y="0" width="' + BODY_SVG_W + '" height="' + BODY_SVG_H + '"/>' +
+      markers + '</svg>';
 
     /* クリックイベント */
     var svg = document.getElementById('body-svg');
     if (svg) {
       svg.addEventListener('click', function (e) {
-        /* マーカー上クリック → 削除 */
         if (e.target.classList && e.target.classList.contains('pain-marker')) {
           var mcx = parseFloat(e.target.getAttribute('cx')) / BODY_SVG_W;
           var mcy = parseFloat(e.target.getAttribute('cy')) / BODY_SVG_H;
-          _data.painLocations[_currentBodyView] = _data.painLocations[_currentBodyView].filter(function (loc) {
+          _data.painLocations = _data.painLocations.filter(function (loc) {
             return Math.abs(loc.x - mcx) > 0.001 || Math.abs(loc.y - mcy) > 0.001;
           });
           _updateBodySVG();
           return;
         }
-        /* 新規マーカー追加 */
         var pt = new DOMPoint(e.clientX, e.clientY);
         var svgPt = pt.matrixTransform(svg.getScreenCTM().inverse());
-        _data.painLocations[_currentBodyView].push({ x: svgPt.x / BODY_SVG_W, y: svgPt.y / BODY_SVG_H });
+        _data.painLocations.push({ x: svgPt.x / BODY_SVG_W, y: svgPt.y / BODY_SVG_H });
         _updateBodySVG();
       });
     }
@@ -340,7 +326,7 @@ var WizardView = (function () {
     /* マーカー数表示 */
     var countEl = document.getElementById('body-diagram-count');
     if (countEl) {
-      var total = (_data.painLocations.front || []).length + (_data.painLocations.back || []).length;
+      var total = _data.painLocations.length;
       countEl.textContent = total > 0 ? total + '箇所マーク済み' : '';
     }
   }
@@ -352,36 +338,19 @@ var WizardView = (function () {
       wrap.style.display = '';
     } else {
       wrap.style.display = 'none';
-      _data.painLocations = { front: [], back: [] };
+      _data.painLocations = [];
       _updateBodySVG();
     }
   }
 
   function _initBodyDiagram() {
-    _currentBodyView = 'front';
-
-    /* タブ切り替え */
-    document.querySelectorAll('.body-diagram-tab').forEach(function (tab) {
-      tab.addEventListener('click', function () {
-        document.querySelectorAll('.body-diagram-tab').forEach(function (t) {
-          t.classList.remove('active');
-        });
-        this.classList.add('active');
-        _currentBodyView = this.getAttribute('data-view');
-        _updateBodySVG();
-      });
-    });
-
-    /* クリアボタン */
     var clearBtn = document.getElementById('body-diagram-clear');
     if (clearBtn) {
       clearBtn.addEventListener('click', function () {
-        _data.painLocations = { front: [], back: [] };
+        _data.painLocations = [];
         _updateBodySVG();
       });
     }
-
-    /* 初期描画 */
     _updateBodySVG();
   }
 
@@ -904,10 +873,8 @@ var WizardView = (function () {
 
     var esasT = _esasTotal();
     html += _confirmRow('<strong>合計</strong>', '<strong class="' + _esasTotalColorClass(esasT) + '">' + esasT + ' / 100（' + _esasTotalLabel(esasT) + '）</strong>');
-    var _plFront = _data.painLocations.front ? _data.painLocations.front.length : 0;
-    var _plBack = _data.painLocations.back ? _data.painLocations.back.length : 0;
-    if (_plFront + _plBack > 0) {
-      html += _confirmRow('痛みの部位', (_plFront + _plBack) + '箇所マーク済み');
+    if (_data.painLocations.length > 0) {
+      html += _confirmRow('痛みの部位', _data.painLocations.length + '箇所マーク済み');
     }
     html += '</div>';
 
