@@ -370,10 +370,6 @@ var WizardView = (function () {
         '<input type="range" class="nrs-slider" id="nrs-' + item.key + '" min="0" max="10" value="' + val + '">' +
         '<div class="nrs-scale"><span>0 なし</span><span>10 最悪</span></div>' +
       '</div>';
-      /* 痛みスライダーの直下にボディダイアグラム */
-      if (item.key === 'pain') {
-        html += _renderBodyDiagram();
-      }
     });
 
     /* 合計 */
@@ -383,6 +379,9 @@ var WizardView = (function () {
       '<div class="esas-total-score ' + _esasTotalColorClass(total) + '" id="esas-total-score">' + total + ' / 100</div>' +
       '<div class="esas-total-hint" id="esas-total-hint">重症度: ' + _esasTotalLabel(total) + '</div>' +
     '</div>';
+
+    /* ボディダイアグラム（ESAS合計の下、カード内末尾） */
+    html += _renderBodyDiagram();
 
     html += '</div>';
     return html;
