@@ -73,6 +73,38 @@ var WizardView = (function () {
     return html;
   }
 
+  /** ステップ別バリデーション — 未入力項目名の配列を返す */
+  function _validateStep(step) {
+    var missing = [];
+    switch (step) {
+      case 1:
+        if (!_data.age) missing.push('年代');
+        if (!_data.sex) missing.push('性別');
+        break;
+      case 3:
+        var sarcfLabels = { strength:'筋力', walking:'歩行', rising:'椅子からの立ち上がり', stairs:'階段', falls:'転倒' };
+        ['strength','walking','rising','stairs','falls'].forEach(function (k) {
+          if (_data.sarcf[k] === '' || _data.sarcf[k] === undefined) missing.push(sarcfLabels[k]);
+        });
+        break;
+    }
+    return missing;
+  }
+
+  function _showValidationError(missing) {
+    var old = document.getElementById('wizard-validation-msg');
+    if (old) old.remove();
+    var nav = document.querySelector('.wizard-nav');
+    if (!nav) return;
+    var msg = document.createElement('div');
+    msg.id = 'wizard-validation-msg';
+    msg.className = 'notice notice-warn';
+    msg.style.marginBottom = '0.5rem';
+    msg.innerHTML = '未回答の項目があります: <strong>' + missing.join('、') + '</strong>';
+    nav.parentNode.insertBefore(msg, nav);
+    msg.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
   function _bindNav(step) {
     var prev = document.getElementById('wizard-prev');
     var next = document.getElementById('wizard-next');
@@ -85,6 +117,8 @@ var WizardView = (function () {
     }
     if (next) {
       next.addEventListener('click', function () {
+        var missing = _validateStep(step);
+        if (missing.length > 0) { _showValidationError(missing); return; }
         Router.navigate('wizard', { step: String(step + 1) });
       });
     }
