@@ -492,11 +492,9 @@ body {
 
 /* ── ボディダイアグラム ─────────────── */
 .body-diagram-wrap {
-  margin-top: 0.75rem;
-  margin-bottom: 1rem;
-  padding: 1rem;
+  margin: 0.75rem -1.25rem 1rem;
+  padding: 1rem 0.5rem;
   background: #F7F9FA;
-  border-radius: 10px;
 }
 
 .body-diagram-label {
