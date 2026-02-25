@@ -27,15 +27,10 @@ body {
 
 #app {
   width: 100%;
-  max-width: 520px;
+  max-width: 720px;
   min-height: 100dvh;
   position: relative;
   padding: 1.5rem 1.25rem 3rem;
-}
-
-#app.result-mode,
-#app.wide-mode {
-  max-width: 720px;
 }
 
 /* ── ローディング画面 ────────────────── */

@@ -1009,8 +1009,6 @@ var WizardView = (function () {
 
     var app = document.getElementById('app');
     app.classList.remove('result-mode');
-    if (step === 2) { app.classList.add('wide-mode'); }
-    else { app.classList.remove('wide-mode'); }
 
     var body = '';
     switch (step) {
