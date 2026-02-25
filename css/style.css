@@ -481,6 +481,49 @@ body {
   padding: 0 2px;
 }
 
+/* NRSボタン */
+.nrs-buttons {
+  display: flex;
+  gap: 3px;
+}
+
+.nrs-btn {
+  flex: 1;
+  padding: 0.45rem 0;
+  border: 1.5px solid #DFE6E9;
+  border-radius: 6px;
+  background: #fff;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #636E72;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: center;
+}
+
+.nrs-btn:hover {
+  background: #F0F5F3;
+}
+
+.nrs-btn.selected {
+  color: #fff;
+  border-color: transparent;
+}
+
+.nrs-btn[data-val="0"].selected,
+.nrs-btn[data-val="1"].selected,
+.nrs-btn[data-val="2"].selected,
+.nrs-btn[data-val="3"].selected { background: #2E8B6A; }
+
+.nrs-btn[data-val="4"].selected,
+.nrs-btn[data-val="5"].selected,
+.nrs-btn[data-val="6"].selected { background: #FF9800; }
+
+.nrs-btn[data-val="7"].selected,
+.nrs-btn[data-val="8"].selected,
+.nrs-btn[data-val="9"].selected,
+.nrs-btn[data-val="10"].selected { background: #E53935; }
+
 /* NRS色分け */
 .nrs-low    { color: #2E8B6A; }
 .nrs-mid    { color: #FF9800; }

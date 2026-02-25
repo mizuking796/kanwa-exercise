@@ -428,8 +428,13 @@ var WizardView = (function () {
           '<span class="nrs-label">' + item.label + '</span>' +
           '<span class="nrs-value ' + colorCls + '" id="nrs-val-' + item.key + '">' + val + '</span>' +
         '</div>' +
-        '<input type="range" class="nrs-slider" id="nrs-' + item.key + '" min="0" max="10" value="' + val + '">' +
-        '<div class="nrs-scale"><span>0 なし</span><span>10 最悪</span></div>' +
+        '<div class="nrs-buttons" data-key="' + item.key + '">';
+      for (var n = 0; n <= 10; n++) {
+        var sel = (n === val) ? ' selected' : '';
+        html += '<button class="nrs-btn' + sel + '" data-val="' + n + '">' + n + '</button>';
+      }
+      html += '</div>' +
+        '<div class="nrs-scale"><span>なし</span><span>最もひどい</span></div>' +
       '</div>';
     });
 
@@ -457,21 +462,22 @@ var WizardView = (function () {
   }
 
   function _bindStep2() {
-    ESAS_ITEMS.forEach(function (item) {
-      var slider = document.getElementById('nrs-' + item.key);
-      var valEl  = document.getElementById('nrs-val-' + item.key);
-      if (!slider) return;
-      slider.addEventListener('input', function () {
-        var v = parseInt(this.value, 10);
-        _data.esas[item.key] = v;
-        if (valEl) {
-          valEl.textContent = v;
-          valEl.className = 'nrs-value ' + _nrsColorClass(v);
-        }
-        _updateEsasTotal();
-        if (item.key === 'pain') {
-          _toggleBodyDiagram(v);
-        }
+    document.querySelectorAll('.nrs-buttons').forEach(function (group) {
+      var key = group.getAttribute('data-key');
+      var valEl = document.getElementById('nrs-val-' + key);
+      group.querySelectorAll('.nrs-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var v = parseInt(this.getAttribute('data-val'), 10);
+          _data.esas[key] = v;
+          if (valEl) {
+            valEl.textContent = v;
+            valEl.className = 'nrs-value ' + _nrsColorClass(v);
+          }
+          group.querySelectorAll('.nrs-btn').forEach(function (b) { b.classList.remove('selected'); });
+          this.classList.add('selected');
+          _updateEsasTotal();
+          if (key === 'pain') { _toggleBodyDiagram(v); }
+        });
       });
     });
     /* ボディダイアグラム初期化 */
