@@ -23,7 +23,9 @@ var WizardView = (function () {
     /* Step 4: 運動中止基準 */
     vitals: { hr:'', sbp:'', dbp:'', spo2:'', temp:'' },
     blood: { hb:'', plt:'', wbc:'' },
-    symptoms: []
+    symptoms: [],
+    /* ボディダイアグラム */
+    painLocations: { front: [], back: [] }
   };
 
   var TOTAL_STEPS = 5;
@@ -267,6 +269,139 @@ var WizardView = (function () {
     { key: 'wellbeing',  label: '全体的な調子' }
   ];
 
+  /* ── ボディダイアグラム（痛み部位図） ── */
+
+  var _currentBodyView = 'front';
+
+  var BODY_OUTLINE_PATH = 'M 86,52 L 86,66 L 40,80 L 32,90 L 28,140 L 22,185 L 18,210' +
+    ' L 14,222 L 24,228 L 32,216 L 36,180 L 44,132 L 52,96 L 56,128' +
+    ' L 54,158 L 50,200 L 46,236 L 42,276 L 40,312 L 38,336 L 44,348' +
+    ' L 58,350 L 62,338 L 60,312 L 64,276 L 72,242 L 86,214 L 100,206' +
+    ' L 114,214 L 128,242 L 136,276 L 140,312 L 138,338 L 142,350' +
+    ' L 156,348 L 162,336 L 160,312 L 158,276 L 154,236 L 150,200' +
+    ' L 146,158 L 144,128 L 148,96 L 156,132 L 164,180 L 168,216' +
+    ' L 176,228 L 186,222 L 182,210 L 178,185 L 172,140 L 168,90' +
+    ' L 160,80 L 114,66 L 114,52 Z';
+
+  function _bodyFrontInner() {
+    return '<ellipse cx="100" cy="30" rx="18" ry="22" fill="#F5E6D3" stroke="#888" stroke-width="1.2"/>' +
+      '<path d="' + BODY_OUTLINE_PATH + '" fill="#F5E6D3" stroke="#888" stroke-width="1.2"/>' +
+      '<circle cx="100" cy="170" r="2" fill="#ccc"/>' +
+      '<text x="5" y="130" font-size="11" fill="#999" font-family="sans-serif">右</text>';
+  }
+
+  function _bodyBackInner() {
+    return '<ellipse cx="100" cy="30" rx="18" ry="22" fill="#F5E6D3" stroke="#888" stroke-width="1.2"/>' +
+      '<path d="' + BODY_OUTLINE_PATH + '" fill="#F5E6D3" stroke="#888" stroke-width="1.2"/>' +
+      '<line x1="100" y1="56" x2="100" y2="200" stroke="#ccc" stroke-width="1" stroke-dasharray="4,3"/>' +
+      '<text x="185" y="130" font-size="11" fill="#999" font-family="sans-serif">右</text>';
+  }
+
+  function _renderBodyDiagram() {
+    var show = (_data.esas.pain || 0) >= 1;
+    return '<div class="body-diagram-wrap" id="body-diagram-wrap"' +
+      (show ? '' : ' style="display:none;"') + '>' +
+      '<div class="body-diagram-label">図の中で痛みのあるところに印を付けて下さい。</div>' +
+      '<div class="body-diagram-tabs">' +
+        '<button class="body-diagram-tab active" data-view="front">前面</button>' +
+        '<button class="body-diagram-tab" data-view="back">背面</button>' +
+      '</div>' +
+      '<div id="body-diagram-svg-area"></div>' +
+      '<div style="display:flex;align-items:center;gap:0.5rem;margin-top:0.5rem;">' +
+        '<button class="btn btn-sm btn-outline" id="body-diagram-clear">クリア</button>' +
+        '<span class="form-hint" id="body-diagram-count"></span>' +
+      '</div>' +
+    '</div>';
+  }
+
+  function _updateBodySVG() {
+    var area = document.getElementById('body-diagram-svg-area');
+    if (!area) return;
+
+    var inner = _currentBodyView === 'front' ? _bodyFrontInner() : _bodyBackInner();
+
+    /* マーカー描画 */
+    var locs = _data.painLocations[_currentBodyView] || [];
+    var markers = '';
+    for (var i = 0; i < locs.length; i++) {
+      markers += '<circle cx="' + (locs[i].x * 200) + '" cy="' + (locs[i].y * 360) +
+        '" r="8" class="pain-marker"/>';
+    }
+
+    area.innerHTML =
+      '<svg viewBox="0 0 200 360" class="body-diagram-svg" id="body-svg">' +
+      inner + markers + '</svg>';
+
+    /* クリックイベント */
+    var svg = document.getElementById('body-svg');
+    if (svg) {
+      svg.addEventListener('click', function (e) {
+        /* マーカー上クリック → 削除 */
+        if (e.target.classList && e.target.classList.contains('pain-marker')) {
+          var mcx = parseFloat(e.target.getAttribute('cx')) / 200;
+          var mcy = parseFloat(e.target.getAttribute('cy')) / 360;
+          _data.painLocations[_currentBodyView] = _data.painLocations[_currentBodyView].filter(function (loc) {
+            return Math.abs(loc.x - mcx) > 0.001 || Math.abs(loc.y - mcy) > 0.001;
+          });
+          _updateBodySVG();
+          return;
+        }
+        /* 新規マーカー追加 */
+        var pt = new DOMPoint(e.clientX, e.clientY);
+        var svgPt = pt.matrixTransform(svg.getScreenCTM().inverse());
+        _data.painLocations[_currentBodyView].push({ x: svgPt.x / 200, y: svgPt.y / 360 });
+        _updateBodySVG();
+      });
+    }
+
+    /* マーカー数表示 */
+    var countEl = document.getElementById('body-diagram-count');
+    if (countEl) {
+      var total = (_data.painLocations.front || []).length + (_data.painLocations.back || []).length;
+      countEl.textContent = total > 0 ? total + '箇所マーク済み' : '';
+    }
+  }
+
+  function _toggleBodyDiagram(painValue) {
+    var wrap = document.getElementById('body-diagram-wrap');
+    if (!wrap) return;
+    if (painValue >= 1) {
+      wrap.style.display = '';
+    } else {
+      wrap.style.display = 'none';
+      _data.painLocations = { front: [], back: [] };
+      _updateBodySVG();
+    }
+  }
+
+  function _initBodyDiagram() {
+    _currentBodyView = 'front';
+
+    /* タブ切り替え */
+    document.querySelectorAll('.body-diagram-tab').forEach(function (tab) {
+      tab.addEventListener('click', function () {
+        document.querySelectorAll('.body-diagram-tab').forEach(function (t) {
+          t.classList.remove('active');
+        });
+        this.classList.add('active');
+        _currentBodyView = this.getAttribute('data-view');
+        _updateBodySVG();
+      });
+    });
+
+    /* クリアボタン */
+    var clearBtn = document.getElementById('body-diagram-clear');
+    if (clearBtn) {
+      clearBtn.addEventListener('click', function () {
+        _data.painLocations = { front: [], back: [] };
+        _updateBodySVG();
+      });
+    }
+
+    /* 初期描画 */
+    _updateBodySVG();
+  }
+
   function _renderStep2() {
     var html = '<div class="card">' +
       '<div class="card-title">&#x1F4CB; ESAS-r-J（Edmonton Symptom Assessment System）</div>' +
@@ -283,6 +418,10 @@ var WizardView = (function () {
         '<input type="range" class="nrs-slider" id="nrs-' + item.key + '" min="0" max="10" value="' + val + '">' +
         '<div class="nrs-scale"><span>0 なし</span><span>10 最悪</span></div>' +
       '</div>';
+      /* 痛みスライダーの直下にボディダイアグラム */
+      if (item.key === 'pain') {
+        html += _renderBodyDiagram();
+      }
     });
 
     /* 合計 */
@@ -318,8 +457,13 @@ var WizardView = (function () {
           valEl.className = 'nrs-value ' + _nrsColorClass(v);
         }
         _updateEsasTotal();
+        if (item.key === 'pain') {
+          _toggleBodyDiagram(v);
+        }
       });
     });
+    /* ボディダイアグラム初期化 */
+    _initBodyDiagram();
   }
 
   function _updateEsasTotal() {
@@ -777,6 +921,11 @@ var WizardView = (function () {
 
     var esasT = _esasTotal();
     html += _confirmRow('<strong>合計</strong>', '<strong class="' + _esasTotalColorClass(esasT) + '">' + esasT + ' / 100（' + _esasTotalLabel(esasT) + '）</strong>');
+    var _plFront = _data.painLocations.front ? _data.painLocations.front.length : 0;
+    var _plBack = _data.painLocations.back ? _data.painLocations.back.length : 0;
+    if (_plFront + _plBack > 0) {
+      html += _confirmRow('痛みの部位', (_plFront + _plBack) + '箇所マーク済み');
+    }
     html += '</div>';
 
     /* ── Step 3: SARC-F ── */

@@ -490,6 +490,62 @@ body {
 .nrs-mid    { color: #FF9800; }
 .nrs-high   { color: #E53935; }
 
+/* ── ボディダイアグラム ─────────────── */
+.body-diagram-wrap {
+  margin-top: 0.75rem;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  background: #F7F9FA;
+  border-radius: 10px;
+}
+
+.body-diagram-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #2D3436;
+  margin-bottom: 0.6rem;
+}
+
+.body-diagram-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.body-diagram-tab {
+  flex: 1;
+  padding: 0.4rem 0;
+  border: 1.5px solid #DFE6E9;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #636E72;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.body-diagram-tab.active {
+  background: #E8F5EE;
+  border-color: #2E8B6A;
+  color: #2E8B6A;
+}
+
+.body-diagram-svg {
+  display: block;
+  width: 100%;
+  max-width: 200px;
+  margin: 0 auto;
+  cursor: crosshair;
+}
+
+.pain-marker {
+  fill: rgba(229, 57, 53, 0.7);
+  stroke: #C62828;
+  stroke-width: 1.5;
+  cursor: pointer;
+}
+
 /* ── BMIバッジ ──────────────────── */
 .bmi-badge {
   display: inline-flex;

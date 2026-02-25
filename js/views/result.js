@@ -174,6 +174,16 @@ var ResultView = (function () {
       '<span class="confirm-row-value"><strong class="' + severity.cls + '">' + esasTotal + ' / 100</strong>(' + severity.label + ')</span>' +
     '</div>';
 
+    // 痛みの部位
+    var painLocs = data.painLocations || { front: [], back: [] };
+    var _plc = (painLocs.front ? painLocs.front.length : 0) + (painLocs.back ? painLocs.back.length : 0);
+    if (_plc > 0) {
+      html += '<div class="confirm-row">' +
+        '<span class="confirm-row-label">痛みの部位</span>' +
+        '<span class="confirm-row-value">' + _plc + '箇所</span>' +
+      '</div>';
+    }
+
     // SARC-F 合計
     html += '<div class="confirm-row">' +
       '<span class="confirm-row-label">SARC-F 合計</span>' +
@@ -373,7 +383,8 @@ var ResultView = (function () {
       calfCircumference: calfCircumference,
       vitals: data.vitals,
       blood: data.blood,
-      symptoms: data.symptoms
+      symptoms: data.symptoms,
+      painLocations: data.painLocations || { front: [], back: [] }
     };
   }
 
@@ -491,6 +502,7 @@ var ResultView = (function () {
         d.vitals = { hr:'', sbp:'', dbp:'', spo2:'', temp:'' };
         d.blood = { hb:'', plt:'', wbc:'' };
         d.symptoms = [];
+        d.painLocations = { front: [], back: [] };
 
         // result-mode 除去
         document.getElementById('app').classList.remove('result-mode');
