@@ -73,22 +73,47 @@ var WizardView = (function () {
     return html;
   }
 
-  /** ステップ別バリデーション — 未入力項目名の配列を返す */
+  /** ステップ別バリデーション — 未入力項目名の配列を返す + 赤枠ハイライト */
   function _validateStep(step) {
     var missing = [];
+    /* 前回の赤枠を全クリア */
+    document.querySelectorAll('.validation-error').forEach(function (el) {
+      el.classList.remove('validation-error');
+    });
     switch (step) {
       case 1:
-        if (!_data.age) missing.push('年代');
-        if (!_data.sex) missing.push('性別');
+        if (!_data.age) {
+          missing.push('年代');
+          _highlightError('inp-age');
+        }
+        if (!_data.sex) {
+          missing.push('性別');
+          _highlightError('rg-sex');
+        }
         break;
       case 3:
         var sarcfLabels = { strength:'筋力', walking:'歩行', rising:'椅子からの立ち上がり', stairs:'階段', falls:'転倒' };
         ['strength','walking','rising','stairs','falls'].forEach(function (k) {
-          if (_data.sarcf[k] === '' || _data.sarcf[k] === undefined) missing.push(sarcfLabels[k]);
+          if (_data.sarcf[k] === '' || _data.sarcf[k] === undefined) {
+            missing.push(sarcfLabels[k]);
+            /* 該当質問の全選択肢の親 .form-group を赤枠に */
+            var opts = document.querySelectorAll('.sarcf-option[data-q="' + k + '"]');
+            if (opts.length > 0 && opts[0].parentNode) {
+              opts[0].parentNode.classList.add('validation-error');
+            }
+          }
         });
         break;
     }
     return missing;
+  }
+
+  function _highlightError(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    /* .form-group の親要素を探して赤枠を付ける */
+    var group = el.closest('.form-group');
+    if (group) group.classList.add('validation-error');
   }
 
   function _showValidationError(missing) {
@@ -98,11 +123,13 @@ var WizardView = (function () {
     if (!nav) return;
     var msg = document.createElement('div');
     msg.id = 'wizard-validation-msg';
-    msg.className = 'notice notice-warn';
+    msg.className = 'notice notice-danger';
     msg.style.marginBottom = '0.5rem';
     msg.innerHTML = '未回答の項目があります: <strong>' + missing.join('、') + '</strong>';
     nav.parentNode.insertBefore(msg, nav);
-    msg.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    /* 最初の赤枠要素にスクロール */
+    var firstErr = document.querySelector('.validation-error');
+    if (firstErr) firstErr.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 
   function _bindNav(step) {

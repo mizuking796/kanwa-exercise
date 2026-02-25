@@ -486,6 +486,20 @@ body {
 .nrs-mid    { color: #FF9800; }
 .nrs-high   { color: #E53935; }
 
+/* ── バリデーションエラー ──────────────── */
+.validation-error {
+  outline: 2px solid #E53935;
+  outline-offset: 4px;
+  border-radius: 8px;
+  animation: shake 0.4s ease-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-4px); }
+  40%, 80% { transform: translateX(4px); }
+}
+
 /* ── ボディダイアグラム ─────────────── */
 .body-diagram-wrap {
   margin: 0.75rem -1.25rem 1rem;
